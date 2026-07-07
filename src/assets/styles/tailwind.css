@@ -115,3 +115,23 @@
 .dd *:first-child {
   margin-top: 0;
 }
+
+/*
+  Visual Editor scroll-reveal override.
+
+  Widgets reveal on scroll via `motion-safe:md:opacity-0` + the `intersect`
+  variant (`&:not([no-intersect])`), driven by an IntersectionObserver in
+  BasicScripts. Inside CloudCannon's Visual Editor that observer doesn't run
+  against re-rendered component nodes, so blocks get stuck at `opacity: 0`
+  (invisible on load, and vanishing after any edit that re-renders a block).
+
+  CloudCannon adds `.cms-editor-active` to <body> ONLY inside the Visual Editor
+  (https://cloudcannon.com/documentation/developer-articles/detecting-your-site-is-loaded-in-the-visual-editor/),
+  so forcing the revealed end-state here leaves the production build untouched.
+*/
+.cms-editor-active [class*='opacity-0'],
+.cms-editor-active [class*='intersect'] {
+  opacity: 1 !important;
+  transform: none !important;
+  animation: none !important;
+}

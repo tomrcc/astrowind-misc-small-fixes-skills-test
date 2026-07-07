@@ -1,6 +1,6 @@
 ---
+_schema: legal
 title: 'Privacy Policy'
-layout: '~/layouts/MarkdownLayout.astro'
 ---
 
 _Last updated_: January 06, 2023

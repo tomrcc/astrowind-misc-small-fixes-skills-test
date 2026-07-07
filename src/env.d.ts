@@ -8,3 +8,9 @@
 // side-effect imports type-check under TypeScript 6 strict (ts2882).
 declare module '@fontsource-variable/*';
 declare module '@fontsource/*';
+
+// CloudCannon sets this flag to `true` on the window inside the Visual Editor
+// iframe. Used by the base layout to lazily load component registration.
+interface Window {
+  inEditorMode?: boolean;
+}

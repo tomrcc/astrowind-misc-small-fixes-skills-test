@@ -46,5 +46,16 @@ const { language, textDirection } = I18N;
     <slot />
 
     <BasicScripts />
+
+    <script>
+      // Only load CloudCannon component registration inside the Visual Editor
+      // iframe (`window.inEditorMode`). The dynamic import keeps this — and the
+      // editable-regions runtime — out of the production bundle entirely.
+      if (window.inEditorMode) {
+        import('../cloudcannon/registerComponents').catch((error) => {
+          console.warn('Failed to load CloudCannon component registration:', error);
+        });
+      }
+    </script>
   </body>
 </html>

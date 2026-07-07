@@ -66,6 +66,35 @@ const postCollection = defineCollection({
   }),
 });
 
+// Page-builder pages. Every marketing/landing page is composed from an ordered
+// array of blocks (`content_blocks`). Blocks are kept loose (`z.any()`) on
+// purpose: each widget component owns its own prop defaults and truthiness
+// guards, and a strict per-block union would silently fall through to a
+// non-page-builder shape when optional YAML fields parse as `null`.
+const pagesCollection = defineCollection({
+  loader: glob({ pattern: '**/*.md', base: 'src/content/pages' }),
+  schema: z.object({
+    _schema: z.string().optional(),
+    title: z.string().optional(),
+    // Which layout the catch-all route wraps the page in.
+    layout: z.enum(['PageLayout', 'LandingLayout']).optional(),
+    metadata: metadataDefinition(),
+    content_blocks: z.array(z.any()).default([]),
+  }),
+});
+
+// Long-form legal/policy pages rendered as a prose markdown body.
+const legalCollection = defineCollection({
+  loader: glob({ pattern: '*.md', base: 'src/content/legal' }),
+  schema: z.object({
+    _schema: z.string().optional(),
+    title: z.string().optional(),
+    metadata: metadataDefinition(),
+  }),
+});
+
 export const collections = {
   post: postCollection,
+  pages: pagesCollection,
+  legal: legalCollection,
 };

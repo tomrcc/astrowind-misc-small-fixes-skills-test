@@ -1,0 +1,40 @@
+/*
+  Rich-text editor styles for CloudCannon.
+
+  Loaded via `options.styles` on the `type: html` inputs (title/subtitle/
+  content/description). These fields render on the site through `set:html`, so
+  the values contain inline markup. This stylesheet gives editors an accurate
+  preview of that markup inside the rich-text editor and exposes a couple of
+  semantic emphasis classes they can apply from the toolbar.
+
+  Colours mirror the AstroWind brand tokens defined in
+  src/assets/styles/tailwind.css (`--aw-color-*`).
+
+  NOTE: existing content still carries raw Tailwind utility classes inside these
+  HTML fields (e.g. `text-accent`, `hidden xl:inline`). Migrating that legacy
+  markup to the semantic classes below is deferred (flagged in
+  .cloudcannon/migration/content.md) — rendering is already pixel-correct, so
+  this is presentation polish, not a correctness fix.
+*/
+
+:root {
+  --color-brand: var(--aw-color-primary, #2563eb);
+  --color-accent: var(--aw-color-accent, #f43f5e);
+}
+
+/* Brand-accent emphasis — the semantic replacement for `<span class="text-accent">`. */
+.highlight,
+.text-accent {
+  color: var(--color-accent);
+}
+
+/* Muted secondary emphasis. */
+.subtle {
+  color: #64748b;
+}
+
+/* Keep headings inside body content visually distinct in the editor. */
+.content h3,
+h3 {
+  font-weight: 700;
+}

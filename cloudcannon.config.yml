@@ -1,0 +1,1306 @@
+# CloudCannon configuration — AstroWind
+
+paths:
+  static: public
+  # Blog body images inserted via the rich-text toolbar land here (plain <img>).
+  uploads: public/images
+
+# CloudCannon's understanding of the markdown body. Posts use GFM tables.
+markdown:
+  options:
+    gfm: true
+    table: true
+
+# Shared data files. `navigation` backs the header + footer; it's edited in the
+# Data editor (see file_config), not inline — hrefs are resolved at build time
+# through getPermalink()/getAsset() in src/navigation.ts and some links are
+# `{type,url}` objects, so inline `@data` editing would bypass the resolver.
+data_config:
+  navigation:
+    path: src/data/navigation.json
+
+collection_groups:
+  - heading: Pages
+    collections:
+      - pages
+      - homes
+      - landing
+      - legal
+  - heading: Blog
+    collections:
+      - post
+  - heading: Site
+    collections:
+      - config
+
+collections_config:
+  # --- Page-builder pages -------------------------------------------------
+  pages:
+    path: src/content/pages
+    # Exclude the subdirectory groups — they get their own collections below.
+    glob:
+      - '**/*.md'
+      - '!homes/**'
+      - '!landing/**'
+    url: '/[slug]/'
+    icon: wysiwyg
+    _enabled_editors:
+      - visual
+      - data
+    schemas:
+      page_builder:
+        path: .cloudcannon/schemas/page-builder.md
+        name: Page
+        new_preview_url: /about/
+    add_options:
+      - name: Page
+        schema: page_builder
+        icon: dashboard
+
+  homes:
+    path: src/content/pages/homes
+    url: '/homes/[slug]/'
+    icon: home
+    _enabled_editors:
+      - visual
+      - data
+    schemas:
+      page_builder:
+        path: .cloudcannon/schemas/page-builder.md
+        name: Home variant
+        new_preview_url: /homes/saas/
+    add_options:
+      - name: Home variant
+        schema: page_builder
+        icon: home
+
+  landing:
+    path: src/content/pages/landing
+    url: '/landing/[slug]/'
+    icon: ad
+    _enabled_editors:
+      - visual
+      - data
+    schemas:
+      landing:
+        path: .cloudcannon/schemas/landing.md
+        name: Landing page
+        new_preview_url: /landing/product/
+    add_options:
+      - name: Landing page
+        schema: landing
+        icon: ad
+
+  legal:
+    path: src/content/legal
+    url: '/[slug]/'
+    icon: gavel
+    _enabled_editors:
+      - content
+      - data
+    add_options:
+      - name: Legal page
+        editor: content
+
+  # --- Blog ----------------------------------------------------------------
+  post:
+    path: src/data/post
+    # Posts render at the site root via permalink `/%slug%` (utils/blog.ts),
+    # and the slug is derived from the filename — so `[slug]` (filename) is correct.
+    url: '/[slug]/'
+    icon: post_add
+    _enabled_editors:
+      - visual
+      - content
+      - data
+    add_options:
+      - name: Blog Post
+        editor: content
+    _inputs:
+      title:
+        type: text
+      excerpt:
+        type: textarea
+        comment: Short summary shown in listings and as the meta description.
+      publishDate:
+        type: datetime
+      updateDate:
+        type: datetime
+      draft:
+        type: switch
+        comment: Draft posts are excluded from the build.
+      image:
+        type: image
+        comment: Featured image. Accepts a remote URL or an uploaded image.
+      category:
+        type: text
+      author:
+        type: text
+      tags:
+        type: array
+        comment: Freeform tags. Each becomes a /tag/… page.
+      metadata:
+        type: object
+        options:
+          preview:
+            icon: settings
+        comment: Advanced per-page SEO overrides. Optional.
+      metadata.openGraph.images:
+        type: array
+        options:
+          structures: _structures.og_images
+
+  # --- Site config ---------------------------------------------------------
+  config:
+    path: src
+    glob:
+      - config.yaml
+    disable_url: true
+    icon: settings
+    _enabled_editors:
+      - data
+
+# --- Global inputs ----------------------------------------------------------
+# Block field types, applied across the page-builder collections. Collection-
+# scoped inputs (e.g. post.title) still override these for their own files.
+_inputs:
+  content_blocks:
+    type: array
+    label: Page sections
+    options:
+      structures: _structures.content_blocks
+  title:
+    type: html
+    options:
+      allow_custom_markup: true
+      styles: .cloudcannon/styles/editor.css
+  subtitle:
+    type: html
+    options:
+      allow_custom_markup: true
+      styles: .cloudcannon/styles/editor.css
+  tagline:
+    type: text
+  content:
+    type: html
+    options:
+      allow_custom_markup: true
+      styles: .cloudcannon/styles/editor.css
+  description:
+    type: html
+    options:
+      allow_custom_markup: true
+      styles: .cloudcannon/styles/editor.css
+  information:
+    type: textarea
+  icon:
+    type: text
+    comment: 'Icon name, e.g. tabler:rocket or flat-color-icons:template'
+  columns:
+    type: number
+  count:
+    type: number
+  button:
+    type: text
+  linkText:
+    type: text
+  isReversed:
+    type: switch
+  isAfterContent:
+    type: switch
+  isBeforeContent:
+    type: switch
+  id:
+    type: text
+    comment: Optional anchor id for in-page links (e.g. "features" → /#features).
+  image:
+    type: object
+    options:
+      preview:
+        icon: image
+  image.src:
+    type: image
+    options:
+      paths:
+        uploads: src/assets/images
+        static: ''
+  image.alt:
+    type: text
+  actions:
+    type: array
+    options:
+      structures: _structures.actions
+  items:
+    type: array
+    options:
+      structures: _structures.items
+  stats:
+    type: array
+    options:
+      structures: _structures.stats
+  prices:
+    type: array
+    options:
+      structures: _structures.prices
+  testimonials:
+    type: array
+    options:
+      structures: _structures.testimonials
+  inputs:
+    type: array
+    options:
+      structures: _structures.form_inputs
+  images:
+    type: array
+    options:
+      structures: _structures.brand_images
+  icons:
+    type: array
+    comment: Icon names for brand logos.
+  textarea:
+    type: object
+    options:
+      preview:
+        icon: notes
+  disclaimer:
+    type: object
+    options:
+      preview:
+        icon: gpp_maybe
+  callToAction:
+    type: object
+    options:
+      preview:
+        icon: ads_click
+  callToAction.text:
+    type: text
+  callToAction.href:
+    type: text
+  callToAction.icon:
+    type: text
+  callToAction.variant:
+    type: select
+    options:
+      values:
+        - primary
+        - secondary
+        - tertiary
+        - link
+  callToAction.target:
+    type: select
+    options:
+      allow_create: true
+      values:
+        - '_blank'
+        - '_self'
+  callToAction2:
+    type: object
+    options:
+      preview:
+        icon: ads_click
+  callToAction2.text:
+    type: text
+  callToAction2.href:
+    type: text
+  callToAction2.icon:
+    type: text
+  callToAction2.variant:
+    type: select
+    options:
+      values:
+        - primary
+        - secondary
+        - tertiary
+        - link
+  callToAction2.target:
+    type: select
+    options:
+      allow_create: true
+      values:
+        - '_blank'
+        - '_self'
+
+# --- Structures -------------------------------------------------------------
+
+_structures:
+  # Page-builder blocks. `_type` maps to a widget in src/cloudcannon/componentMap.ts.
+  content_blocks:
+    style: modal
+    values:
+      - label: Hero
+        icon: featured_video
+        picker_preview:
+          text:
+            - Hero
+          icon:
+            - featured_video
+        preview:
+          text:
+            - key: title
+            - Hero
+          icon:
+            - featured_video
+        value:
+          _type: hero
+          tagline:
+          title:
+          subtitle:
+          content:
+          actions: []
+          image:
+            src:
+            alt:
+      - label: Hero (split)
+        icon: featured_video
+        picker_preview:
+          text:
+            - Hero (split)
+          icon:
+            - featured_video
+        preview:
+          text:
+            - key: title
+            - Hero (split)
+          icon:
+            - featured_video
+        value:
+          _type: hero2
+          tagline:
+          title:
+          subtitle:
+          content:
+          actions: []
+          image:
+            src:
+            alt:
+      - label: Hero (text only)
+        icon: title
+        picker_preview:
+          text:
+            - Hero (text only)
+          icon:
+            - title
+        preview:
+          text:
+            - key: title
+            - Hero (text only)
+          icon:
+            - title
+        value:
+          _type: hero_text
+          tagline:
+          title:
+          subtitle:
+          content:
+          callToAction:
+          callToAction2:
+      - label: Note
+        icon: sticky_note_2
+        picker_preview:
+          text:
+            - Note
+          icon:
+            - sticky_note_2
+        preview:
+          text:
+            - key: title
+            - Note
+          icon:
+            - sticky_note_2
+        value:
+          _type: note
+          icon: tabler:info-square
+          title:
+          description:
+      - label: Features
+        icon: grid_view
+        picker_preview:
+          text:
+            - Features
+          icon:
+            - grid_view
+        preview:
+          text:
+            - key: title
+            - Features
+          icon:
+            - grid_view
+        value:
+          _type: features
+          id:
+          tagline:
+          title:
+          subtitle:
+          items: []
+          columns: 2
+          isBeforeContent: false
+          isAfterContent: false
+      - label: Features (grid)
+        icon: grid_on
+        picker_preview:
+          text:
+            - Features (grid)
+          icon:
+            - grid_on
+        preview:
+          text:
+            - key: title
+            - Features (grid)
+          icon:
+            - grid_on
+        value:
+          _type: features2
+          tagline:
+          title:
+          subtitle:
+          items: []
+          columns: 3
+      - label: Features (with image)
+        icon: photo_library
+        picker_preview:
+          text:
+            - Features (with image)
+          icon:
+            - photo_library
+        preview:
+          text:
+            - key: title
+            - Features (with image)
+          icon:
+            - photo_library
+        value:
+          _type: features3
+          tagline:
+          title:
+          subtitle:
+          items: []
+          columns: 3
+          image:
+            src:
+            alt:
+          isBeforeContent: false
+          isAfterContent: false
+      - label: Steps
+        icon: format_list_numbered
+        picker_preview:
+          text:
+            - Steps
+          icon:
+            - format_list_numbered
+        preview:
+          text:
+            - key: title
+            - Steps
+          icon:
+            - format_list_numbered
+        value:
+          _type: steps
+          id:
+          tagline:
+          title:
+          subtitle:
+          items: []
+          callToAction:
+          image:
+            src:
+            alt:
+          isReversed: false
+      - label: Steps (icons)
+        icon: checklist
+        picker_preview:
+          text:
+            - Steps (icons)
+          icon:
+            - checklist
+        preview:
+          text:
+            - key: title
+            - Steps (icons)
+          icon:
+            - checklist
+        value:
+          _type: steps2
+          id:
+          tagline:
+          title:
+          subtitle:
+          items: []
+          callToAction:
+          isReversed: false
+      - label: Content
+        icon: article
+        picker_preview:
+          text:
+            - Content
+          icon:
+            - article
+        preview:
+          text:
+            - key: title
+            - Content
+          icon:
+            - article
+        value:
+          _type: content
+          id:
+          tagline:
+          title:
+          subtitle:
+          content:
+          items: []
+          columns:
+          image:
+            src:
+            alt:
+          isReversed: false
+          isAfterContent: false
+          callToAction:
+      - label: Call to action
+        icon: ads_click
+        picker_preview:
+          text:
+            - Call to action
+          icon:
+            - ads_click
+        preview:
+          text:
+            - key: title
+            - Call to action
+          icon:
+            - ads_click
+        value:
+          _type: call_to_action
+          tagline:
+          title:
+          subtitle:
+          actions: []
+      - label: FAQs
+        icon: help
+        picker_preview:
+          text:
+            - FAQs
+          icon:
+            - help
+        preview:
+          text:
+            - key: title
+            - FAQs
+          icon:
+            - help
+        value:
+          _type: faqs
+          tagline:
+          title:
+          subtitle:
+          items: []
+          columns: 2
+      - label: Stats
+        icon: bar_chart
+        picker_preview:
+          text:
+            - Stats
+          icon:
+            - bar_chart
+        preview:
+          text:
+            - key: title
+            - Stats
+          icon:
+            - bar_chart
+        value:
+          _type: stats
+          tagline:
+          title:
+          subtitle:
+          stats: []
+      - label: Pricing
+        icon: sell
+        picker_preview:
+          text:
+            - Pricing
+          icon:
+            - sell
+        preview:
+          text:
+            - key: title
+            - Pricing
+          icon:
+            - sell
+        value:
+          _type: pricing
+          tagline:
+          title:
+          subtitle:
+          prices: []
+      - label: Testimonials
+        icon: format_quote
+        picker_preview:
+          text:
+            - Testimonials
+          icon:
+            - format_quote
+        preview:
+          text:
+            - key: title
+            - Testimonials
+          icon:
+            - format_quote
+        value:
+          _type: testimonials
+          tagline:
+          title:
+          subtitle:
+          testimonials: []
+          callToAction:
+      - label: Contact form
+        icon: contact_mail
+        picker_preview:
+          text:
+            - Contact form
+          icon:
+            - contact_mail
+        preview:
+          text:
+            - key: title
+            - Contact form
+          icon:
+            - contact_mail
+        value:
+          _type: contact
+          id:
+          tagline:
+          title:
+          subtitle:
+          inputs: []
+          textarea:
+            label:
+          disclaimer:
+            label:
+          button:
+          description:
+      - label: Brands
+        icon: verified
+        picker_preview:
+          text:
+            - Brands
+          icon:
+            - verified
+        preview:
+          text:
+            - key: title
+            - Brands
+          icon:
+            - verified
+        value:
+          _type: brands
+          tagline:
+          title:
+          subtitle:
+          icons: []
+          images: []
+      - label: Latest blog posts
+        icon: rss_feed
+        picker_preview:
+          text:
+            - Latest blog posts
+          icon:
+            - rss_feed
+        preview:
+          text:
+            - key: title
+            - Latest blog posts
+          icon:
+            - rss_feed
+        value:
+          _type: blog_latest_posts
+          id:
+          title:
+          information:
+          count: 4
+          linkText: View all posts
+
+  # --- Shared sub-structures ----------------------------------------------
+  actions:
+    values:
+      - label: Button
+        icon: ads_click
+        picker_preview:
+          text:
+            - Button
+          icon:
+            - ads_click
+        preview:
+          text:
+            - key: text
+            - Button
+          icon:
+            - ads_click
+        value:
+          text:
+          href:
+          variant: primary
+          icon:
+          target:
+        _inputs:
+          text:
+            type: text
+          href:
+            type: text
+          variant:
+            type: select
+            options:
+              values:
+                - primary
+                - secondary
+                - tertiary
+                - link
+          target:
+            type: select
+            options:
+              allow_create: true
+              values:
+                - '_blank'
+                - '_self'
+
+  items:
+    values:
+      - label: Item
+        icon: list
+        picker_preview:
+          text:
+            - Item
+          icon:
+            - list
+        preview:
+          text:
+            - key: title
+            - Item
+          icon:
+            - list
+        value:
+          title:
+          description:
+          icon:
+          # Optional per-item link, rendered by Features/Features2/Features3/
+          # FAQs/Content when present. Uses the global callToAction _inputs.
+          callToAction:
+
+  stats:
+    values:
+      - label: Stat
+        icon: numbers
+        picker_preview:
+          text:
+            - Stat
+          icon:
+            - numbers
+        preview:
+          text:
+            - key: title
+            - Stat
+          icon:
+            - numbers
+        value:
+          amount:
+          title:
+          icon:
+        _inputs:
+          amount:
+            type: text
+          title:
+            type: text
+
+  prices:
+    values:
+      - label: Price plan
+        icon: sell
+        picker_preview:
+          text:
+            - Price plan
+          icon:
+            - sell
+        preview:
+          text:
+            - key: title
+            - Price plan
+          icon:
+            - sell
+        value:
+          title:
+          subtitle:
+          price:
+          period:
+          items: []
+          callToAction:
+            text:
+            href:
+            variant: primary
+            target:
+          hasRibbon: false
+          ribbonTitle:
+        _inputs:
+          title:
+            type: text
+          subtitle:
+            type: text
+          price:
+            type: text
+          period:
+            type: text
+          items:
+            type: array
+            options:
+              structures: _structures.price_items
+          callToAction:
+            type: object
+            options:
+              preview:
+                icon: ads_click
+          hasRibbon:
+            type: switch
+          ribbonTitle:
+            type: text
+
+  price_items:
+    values:
+      - label: Feature
+        icon: check
+        picker_preview:
+          text:
+            - Feature
+          icon:
+            - check
+        preview:
+          text:
+            - key: description
+            - Feature
+          icon:
+            - check
+        value:
+          description:
+        _inputs:
+          description:
+            type: text
+
+  testimonials:
+    values:
+      - label: Testimonial
+        icon: format_quote
+        picker_preview:
+          text:
+            - Testimonial
+          icon:
+            - format_quote
+        preview:
+          text:
+            - key: name
+            - Testimonial
+          icon:
+            - format_quote
+        value:
+          testimonial:
+          name:
+          job:
+          image:
+            src:
+            alt:
+        _inputs:
+          testimonial:
+            type: textarea
+          name:
+            type: text
+          job:
+            type: text
+          image:
+            type: object
+            options:
+              preview:
+                icon: image
+
+  form_inputs:
+    values:
+      - label: Field
+        icon: input
+        picker_preview:
+          text:
+            - Field
+          icon:
+            - input
+        preview:
+          text:
+            - key: label
+            - Field
+          icon:
+            - input
+        value:
+          type: text
+          name:
+          label:
+          placeholder:
+          autocomplete:
+        _inputs:
+          type:
+            type: select
+            options:
+              allow_create: true
+              values:
+                - text
+                - email
+                - tel
+                - number
+          name:
+            type: text
+          label:
+            type: text
+          placeholder:
+            type: text
+          autocomplete:
+            type: text
+
+  brand_images:
+    values:
+      - label: Logo
+        icon: image
+        picker_preview:
+          text:
+            - Logo
+          icon:
+            - image
+        preview:
+          text:
+            - key: alt
+            - Logo
+          icon:
+            - image
+        value:
+          src:
+          alt:
+        _inputs:
+          src:
+            type: image
+          alt:
+            type: text
+
+  og_images:
+    values:
+      - label: Open Graph image
+        icon: image
+        picker_preview:
+          text:
+            - Open Graph image
+          icon:
+            - image
+        preview:
+          text:
+            - key: url
+            - Open Graph image
+          icon:
+            - image
+        value:
+          url:
+          width:
+          height:
+        _inputs:
+          url:
+            type: image
+          width:
+            type: number
+          height:
+            type: number
+
+  # --- Navigation (src/data/navigation.json) sub-structures ----------------
+  # A single nav link (label + URL). Reused for footer columns, secondary
+  # links, and header dropdown children.
+  nav_sublinks:
+    values:
+      - label: Link
+        icon: link
+        picker_preview:
+          text:
+            - Link
+          icon:
+            - link
+        preview:
+          text:
+            - key: text
+            - Link
+          icon:
+            - link
+        value:
+          text:
+          href:
+        _inputs:
+          text:
+            type: text
+          href:
+            type: text
+
+  # A top-level header entry: either a direct link or a dropdown with children.
+  nav_menu:
+    values:
+      - label: Link
+        icon: link
+        picker_preview:
+          text:
+            - Link
+          icon:
+            - link
+        preview:
+          text:
+            - key: text
+            - Link
+          icon:
+            - link
+        value:
+          text:
+          href:
+        _inputs:
+          text:
+            type: text
+          href:
+            type: text
+      - label: Dropdown
+        icon: arrow_drop_down_circle
+        picker_preview:
+          text:
+            - Dropdown
+          icon:
+            - arrow_drop_down_circle
+        preview:
+          text:
+            - key: text
+            - Dropdown
+          icon:
+            - arrow_drop_down_circle
+        value:
+          text:
+          links: []
+        _inputs:
+          text:
+            type: text
+          links:
+            type: array
+            options:
+              structures: _structures.nav_sublinks
+
+  # A footer column: heading + list of links.
+  nav_footer_columns:
+    values:
+      - label: Column
+        icon: view_column
+        picker_preview:
+          text:
+            - Column
+          icon:
+            - view_column
+        preview:
+          text:
+            - key: title
+            - Column
+          icon:
+            - view_column
+        value:
+          title:
+          links: []
+        _inputs:
+          title:
+            type: text
+          links:
+            type: array
+            options:
+              structures: _structures.nav_sublinks
+
+  # A header call-to-action button.
+  nav_actions:
+    values:
+      - label: Button
+        icon: ads_click
+        picker_preview:
+          text:
+            - Button
+          icon:
+            - ads_click
+        preview:
+          text:
+            - key: text
+            - Button
+          icon:
+            - ads_click
+        value:
+          text:
+          href:
+          target:
+        _inputs:
+          text:
+            type: text
+          href:
+            type: text
+          target:
+            type: select
+            options:
+              allow_create: true
+              values:
+                - '_blank'
+                - '_self'
+
+  # A footer social icon link.
+  nav_social:
+    values:
+      - label: Social link
+        icon: share
+        picker_preview:
+          text:
+            - Social link
+          icon:
+            - share
+        preview:
+          text:
+            - key: ariaLabel
+            - Social link
+          icon:
+            - share
+        value:
+          ariaLabel:
+          icon:
+          href:
+        _inputs:
+          ariaLabel:
+            type: text
+          icon:
+            type: text
+            comment: 'Icon name, e.g. tabler:brand-x'
+          href:
+            type: text
+
+# --- Site config file (edited in the Data editor) ---------------------------
+
+file_config:
+  - glob: src/config.yaml
+    _inputs:
+      site:
+        type: object
+        options:
+          preview:
+            icon: language
+      metadata:
+        type: object
+        options:
+          preview:
+            icon: share
+      apps:
+        type: object
+        options:
+          preview:
+            icon: apps
+      analytics:
+        type: object
+        options:
+          preview:
+            icon: monitoring
+      ui:
+        type: object
+        options:
+          preview:
+            icon: palette
+      ui.theme:
+        type: select
+        options:
+          values:
+            - system
+            - light
+            - dark
+            - 'light:only'
+            - 'dark:only'
+
+  # Header + footer navigation, edited in the Data editor.
+  - glob: src/data/navigation.json
+    _inputs:
+      header:
+        type: object
+        options:
+          preview:
+            icon: menu
+      footer:
+        type: object
+        options:
+          preview:
+            icon: call_to_action
+      header.links:
+        type: array
+        label: Header menu
+        options:
+          structures: _structures.nav_menu
+      header.actions:
+        type: array
+        label: Header buttons
+        options:
+          structures: _structures.nav_actions
+      footer.links:
+        type: array
+        label: Footer columns
+        options:
+          structures: _structures.nav_footer_columns
+      footer.secondaryLinks:
+        type: array
+        label: Footer secondary links
+        options:
+          structures: _structures.nav_sublinks
+      footer.socialLinks:
+        type: array
+        label: Footer social links
+        options:
+          structures: _structures.nav_social
+      footer.footNote:
+        type: html
+        options:
+          allow_custom_markup: true
+
+# --- Snippets: MDX components usable in post bodies -------------------------
+# Built-in `mdx_component` template resolves automatically (no _snippets_imports).
+# Auto-import is wired in astro.config.ts so editors never see `import` lines.
+
+_snippets:
+  logo:
+    template: mdx_component
+    inline: false
+    preview:
+      text: Logo
+      icon: rocket_launch
+    definitions:
+      component_name: Logo
+  youtube:
+    template: mdx_component
+    inline: false
+    preview:
+      text: YouTube video
+      icon: play_circle
+    definitions:
+      component_name: YouTube
+    _inputs:
+      id:
+        type: text
+        comment: YouTube video ID (e.g. y9n6HkftavM).
+  tweet:
+    template: mdx_component
+    inline: false
+    preview:
+      text: Tweet
+      icon: chat
+    definitions:
+      component_name: Tweet
+    _inputs:
+      id:
+        type: text
+        comment: Full tweet URL.
+  vimeo:
+    template: mdx_component
+    inline: false
+    preview:
+      text: Vimeo video
+      icon: play_circle
+    definitions:
+      component_name: Vimeo
+    _inputs:
+      id:
+        type: text
+        comment: Vimeo video ID.
